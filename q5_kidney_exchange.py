@@ -1,5 +1,3 @@
-# q5 - kidney exchange with cycles up to length 3
-# using ILP to maximize number of patients
 
 import networkx as nx
 import pulp
