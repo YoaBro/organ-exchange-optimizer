@@ -1,6 +1,8 @@
 # Organ Exchange Optimizer
 
-An Integer Linear Programming (ILP) solution for optimizing organ exchange networks to maximize the number of life-saving transplants.
+This is a small coursework project that models a simplified kidney exchange problem as an Integer Linear Programming (ILP) problem.
+
+This project implements only the core algorithmic idea from that setting. It is not a medical system and does not model the full set of real-world medical, legal, ethical, and logistical constraints.
 
 ## Problem Overview
 
@@ -211,19 +213,11 @@ organ-exchange-optimizer/
     └── test_optimizer.py          # Unit tests
 ```
 
-## Contributing
-
-Contributions are welcome! Please see [CONTRIBUTING.md](.github/CONTRIBUTING.md) for guidelines.
-
 ## License
 
 MIT License - See LICENSE file for details.
 
 Free for educational and commercial use with attribution.
-
-## Author
-
-YoaBro
 
 ## Disclaimer
 
@@ -237,6 +231,3 @@ YoaBro
 
 Consult medical professionals and regulatory bodies before deploying in real transplant networks.
 
----
-
-**Questions or Issues?** Feel free to open an issue on GitHub!

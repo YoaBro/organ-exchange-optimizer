@@ -1,0 +1,1107 @@
+diff -ru /mnt/data/organ_repo_original_nocache/.gitignore /mnt/data/organ_repo_clean/.gitignore
+--- /mnt/data/organ_repo_original_nocache/.gitignore	2026-06-07 13:00:49.437323807 +0000
++++ /mnt/data/organ_repo_clean/.gitignore	2026-06-07 13:02:44.173839283 +0000
+@@ -1,135 +1,25 @@
+-# Byte-compiled / optimized / DLL files
+-__pycache__/
+-*.py[cod]
+-*$py.class
+-
+-# C extensions
+-*.so
+-
+-# Distribution / packaging
+-.Python
+-build/
+-develop-eggs/
+-dist/
+-downloads/
+-eggs/
+-.eggs/
+-lib/
+-lib64/
+-parts/
+-sdist/
+-var/
+-wheels/
+-pip-wheel-metadata/
+-share/python-wheels/
+-*.egg-info/
+-.installed.cfg
+-*.egg
+-PIPFILE.lock
+-
+-# PyInstaller
+-*.manifest
+-*.spec
+-
+-# Installer logs
+-pip-log.txt
+-pip-delete-this-directory.txt
+-
+-# Unit test / coverage reports
+-htmlcov/
+-.tox/
+-.nox/
+-.coverage
+-.coverage.*
+-.cache
+-nosetests.xml
+-coverage.xml
+-*.cover
+-*.py,cover
+-.hypothesis/
+-.pytest_cache/
+-
+-# Translations
+-*.mo
+-*.pot
+-
+-# Django stuff:
+-*.log
+-local_settings.py
+-db.sqlite3
+-db.sqlite3-journal
+-
+-# Flask stuff:
+-instance/
+-.webassets-cache
+-
+-# Scrapy stuff:
+-.scrapy
+-
+-# Sphinx documentation
+-docs/_build/
+-
+-# PyBuilder
+-target/
+-
+-# Jupyter Notebook
+-.ipynb_checkpoints
+-
+-# IPython
+-profile_default/
+-ipython_config.py
+-
+-# pyenv
+-.python-version
+-
+-# pipenv
+-Pipfile.lock
+-
+-# PEP 582
+-__pypackages__/
+-
+-# Celery stuff
+-celerybeat-schedule
+-celerybeat.pid
+-
+-# SageMath parsed files
+-*.sage.py
+-
+-# Environments
+-.env
+-.venv
+-env/
+-venv/
+-ENV/
+-env.bak/
+-venv.bak/
+-
+-# Spyder project settings
+-.spyderproject
+-.spyproject
+-
+-# Rope project settings
+-.ropeproject
+-
+-# mkdocs documentation
+-/site
+-
+-# mypy
+-.mypy_cache/
+-.dmypy.json
+-dmypy.json
+-
+-# Pyre type checker
+-.pyre/
+-
+-# IDE
+-.vscode/
+-.idea/
+-*.swp
+-*.swo
+-*~
+-.DS_Store
+-
+-# Output files
+-*.lp
+-*.mps
++# Python
++__pycache__/
++*.py[cod]
++*.egg-info/
++
++# Virtual environments
++.env
++.venv/
++env/
++venv/
++
++# Test/cache files
++.coverage
++.pytest_cache/
++.mypy_cache/
++
++# Solver output files
++*.lp
++*.mps
++
++# Editors / OS
++.vscode/
++.idea/
++.DS_Store
++*.swp
+diff -ru /mnt/data/organ_repo_original_nocache/LICENSE /mnt/data/organ_repo_clean/LICENSE
+--- /mnt/data/organ_repo_original_nocache/LICENSE	2026-06-07 13:00:49.437783026 +0000
++++ /mnt/data/organ_repo_clean/LICENSE	2026-06-07 13:02:44.172030844 +0000
+@@ -1,21 +1,21 @@
+-MIT License
+-
+-Copyright (c) 2026 YoaBro
+-
+-Permission is hereby granted, free of charge, to any person obtaining a copy
+-of this software and associated documentation files (the "Software"), to deal
+-in the Software without restriction, including without limitation the rights
+-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-copies of the Software, and to permit persons to whom the Software is
+-furnished to do so, subject to the following conditions:
+-
+-The above copyright notice and this permission notice shall be included in all
+-copies or substantial portions of the Software.
+-
+-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-SOFTWARE.
++MIT License
++
++Copyright (c) 2026 YoaBro
++
++Permission is hereby granted, free of charge, to any person obtaining a copy
++of this software and associated documentation files (the "Software"), to deal
++in the Software without restriction, including without limitation the rights
++to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++copies of the Software, and to permit persons to whom the Software is
++furnished to do so, subject to the following conditions:
++
++The above copyright notice and this permission notice shall be included in all
++copies or substantial portions of the Software.
++
++THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++SOFTWARE.
+diff -ru /mnt/data/organ_repo_original_nocache/README.md /mnt/data/organ_repo_clean/README.md
+--- /mnt/data/organ_repo_original_nocache/README.md	2026-06-07 13:00:49.440379056 +0000
++++ /mnt/data/organ_repo_clean/README.md	2026-06-07 13:02:44.172381337 +0000
+@@ -1,242 +1,110 @@
+-# Organ Exchange Optimizer
+-
+-An Integer Linear Programming (ILP) solution for optimizing organ exchange networks to maximize the number of life-saving transplants.
+-
+-## Problem Overview
+-
+-Organ exchange is a critical problem in medical logistics where patient-donor pairs are matched to perform organ transplants. The challenge is to find compatible exchanges in a directed graph where:
+-- **Nodes** represent patient-donor pairs
+-- **Edges** represent compatibility (donor from pair A can give to patient from pair B)
+-- **Cycles** represent valid exchanges (2-way swaps or 3-way exchanges)
+-
+-This solver finds the maximum number of disjoint cycles (length 2 or 3) to maximize the total number of patients who can receive transplants.
+-
+-## Solution Approach
+-
+-The solver uses **Integer Linear Programming** via PuLP and CBC solver:
+-
+-1. **Cycle Discovery**: Enumerate all valid 2-cycles (mutual exchanges) and 3-cycles in the graph
+-2. **ILP Formulation**:
+-   - **Decision Variables**: Binary variable for each cycle (selected or not)
+-   - **Objective**: Maximize total patients helped (sum of cycle lengths)
+-   - **Constraints**: Each patient-donor pair participates in at most one cycle
+-
+-## Features
+-
+-- Finds optimal solution to the organ exchange matching problem
+-- Efficient cycle enumeration for 2-cycles and 3-cycles
+-- Uses proven ILP solver (CBC) for guaranteed optimal results
+-- Includes performance benchmarking on random graphs
+-- Handles graphs up to 500+ nodes efficiently
+-- Easy-to-use API with comprehensive documentation
+-
+-## Quick Start
+-
+-### Installation
+-
+-```bash
+-pip install -r requirements.txt
+-```
+-
+-### Basic Example
+-
+-```python
+-import networkx as nx
+-from organ_exchange_optimizer import find_organ_exchange
+-
+-# Create a directed graph of patient-donor pairs
+-G = nx.DiGraph()
+-G.add_edge(0, 1)  # Donor of pair 0 compatible with patient of pair 1
+-G.add_edge(1, 0)  # Donor of pair 1 compatible with patient of pair 0
+-G.add_edge(2, 3)
+-G.add_edge(3, 4)
+-G.add_edge(4, 2)
+-
+-# Solve for optimal organ exchanges
+-cycles, num_transplants = find_organ_exchange(G)
+-
+-print(f"Total transplants possible: {num_transplants}")
+-print("Exchange cycles:")
+-for cycle in cycles:
+-    print(f"  {cycle}")
+-```
+-
+-### Running Tests
+-
+-```bash
+-python organ_exchange_optimizer.py
+-```
+-
+-This will run:
+-- **Part A**: Basic test case with predefined cycles
+-- **Part B**: Performance benchmarking on random graphs (up to 500 nodes)
+-
+-## Requirements
+-
+-- Python 3.7+
+-- NetworkX - Graph data structure and algorithms
+-- PuLP - Linear programming modeling
+-- CBC - Coin-or branch and cut solver
+-
+-Install all dependencies:
+-```bash
+-pip install -r requirements.txt
+-```
+-
+-Or install individually:
+-```bash
+-pip install networkx pulp
+-```
+-
+-## Algorithm Details
+-
+-### Complexity Analysis
+-
+-- **Cycle Enumeration**: O(n²) for 2-cycles, O(n³) for 3-cycles
+-- **ILP Solving**: Polynomial time for small cycles (typical case)
+-- **Overall**: Efficient for practical network sizes
+-
+-### Performance Benchmarks
+-
+-The solver efficiently handles:
+-- **n=100**: < 1 second
+-- **n=300**: < 10 seconds
+-- **n=500**: < 60 seconds
+-
+-(Benchmarks run with 30% edge probability)
+-
+-## How It Works
+-
+-### Step 1: Cycle Discovery
+-
+-The algorithm exhaustively searches the graph for:
+-- **2-cycles**: Bidirectional edges where donor pairs can mutually exchange
+-- **3-cycles**: Three patient-donor pairs in circular compatibility
+-
+-```
+-2-cycle:        3-cycle:
+-0 <-> 1         0 -> 1
+-                |    |
+-                v    v
+-                3 <- 2
+-```
+-
+-### Step 2: ILP Optimization
+-
+-For each cycle found, a binary variable x_i is created. The solver then:
+-- **Maximizes**: Σ (cycle_length × x_i)
+-- **Subject to**: For each node, Σ x_i (cycles containing node) ≤ 1
+-
+-This ensures a valid matching without conflicts.
+-
+-### Step 3: Solution Extraction
+-
+-All cycles with x_i = 1 are selected, and the total number of transplants is computed.
+-
+-## Example Output
+-
+-```
+-=== Part A: Basic Test ===
+-transplants: 5
+-cycles found:
+-   [0, 1]
+-   [2, 3, 4]
+-
+-=== Part B: Random Graphs (max 60 sec) ===
+-n=10: 4 transplants, time=0.01s
+-n=20: 8 transplants, time=0.01s
+-n=50: 18 transplants, time=0.05s
+-n=100: 35 transplants, time=0.12s
+-n=300: 105 transplants, time=5.43s
+-n=500: 152 transplants, time=8.45s
+-
+-largest n that finishes in under 1 minute: 500
+-```
+-
+-## API Reference
+-
+-### `find_organ_exchange(g)`
+-
+-Finds the maximum set of disjoint cycles in a patient-donor compatibility graph.
+-
+-**Parameters:**
+-- `g` (networkx.DiGraph): Directed graph where nodes are patient-donor pairs and edges represent compatibility
+-
+-**Returns:**
+-- `cycles` (list): List of selected cycles, each cycle is a list of node indices
+-- `total` (int): Total number of patients who can receive transplants
+-
+-**Example:**
+-```python
+-cycles, num = find_organ_exchange(G)
+-for cycle in cycles:
+-    print(f"Cycle: {cycle}")
+-print(f"Total transplants: {num}")
+-```
+-
+-### `generate_random_graph(n, p)`
+-
+-Generates a random directed graph for testing and benchmarking.
+-
+-**Parameters:**
+-- `n` (int): Number of nodes
+-- `p` (float): Edge probability (0 to 1)
+-
+-**Returns:**
+-- `g` (networkx.DiGraph): Random directed graph
+-
+-## Real-World Applications
+-
+-This algorithm is used in:
+-- **Medical Transplant Networks**: National Kidney Registry, UNOS Kidney Paired Donation Program
+-- **Organ Donation Coordination**: Matching compatible patient-donor pairs
+-- **Fairness-Aware Matching**: Incorporating constraints for equity and accessibility
+-- **Logistics Optimization**: Coordinating multi-hospital exchanges
+-
+-## Research References
+-
+-- Roth, A. E., Sönmez, T., & Ünver, M. U. (2007). "Efficient Kidney Exchange: Coincidence of Wants in Markets with Compatibility." American Economic Review.
+-- Anderson, R., Ashlagi, I., Gamarnik, D., & Kannan, A. (2015). "Efficient Dynamic Barter Exchange." Operations Research.
+-- Glorie, K. B., van de Velde, S. L., & Wagelmans, A. P. (2014). "Kidney Exchange with Long Chains: Efficient Algorithms and Optimal Solutions." Transplantation.
+-
+-## Project Structure
+-
+-```
+-organ-exchange-optimizer/
+-├── organ_exchange_optimizer.py   # Main solver implementation
+-├── requirements.txt               # Python dependencies
+-├── README.md                      # This file
+-├── LICENSE                        # MIT License
+-└── tests/                         # Test cases
+-    └── test_optimizer.py          # Unit tests
+-```
+-
+-## Contributing
+-
+-Contributions are welcome! Please see [CONTRIBUTING.md](.github/CONTRIBUTING.md) for guidelines.
+-
+-## License
+-
+-MIT License - See LICENSE file for details.
+-
+-Free for educational and commercial use with attribution.
+-
+-## Author
+-
+-YoaBro
+-
+-## Disclaimer
+-
+-**Note**: This is a solution to an academic assignment. For real medical applications, additional constraints must be included:
+-- Blood type compatibility
+-- Tissue matching (HLA compatibility)
+-- Waiting time priorities
+-- Geographic constraints
+-- Medical urgency factors
+-- Fairness and ethical considerations
+-
+-Consult medical professionals and regulatory bodies before deploying in real transplant networks.
+-
+----
+-
+-**Questions or Issues?** Feel free to open an issue on GitHub!
++# Organ Exchange Optimizer
++
++A small coursework project that models a simplified kidney exchange problem as an Integer Linear Programming (ILP) problem.
++
++The solver receives a directed compatibility graph and selects a maximum-size set of disjoint 2-cycles and 3-cycles. In this simplified model, each node represents a patient-donor pair, and an edge `u -> v` means the donor from pair `u` can donate to the patient from pair `v`.
++
++## Coursework note
++
++This repository is kept public as a coursework-style implementation. It is intended to show the algorithmic idea and the Python implementation, not to serve as a real medical matching system.
++
++Real kidney exchange programs include many additional medical, logistical, legal, and ethical constraints that are not modeled here.
++
++## Approach
++
++The implementation has two main steps:
++
++1. Enumerate all valid directed cycles of length 2 and 3.
++2. Build an ILP with one binary variable per cycle:
++   - maximize the total number of participating pairs;
++   - require each node to appear in at most one selected cycle.
++
++This gives an optimal solution for the simplified objective over the cycles that were enumerated.
++
++## Installation
++
++```bash
++pip install -r requirements.txt
++```
++
++Requirements:
++
++- Python 3.7+
++- NetworkX
++- PuLP, including the CBC solver bundled with PuLP in typical installations
++
++## Usage
++
++```python
++import networkx as nx
++from organ_exchange_optimizer import find_organ_exchange
++
++G = nx.DiGraph()
++
++# 2-cycle: 0 <-> 1
++G.add_edge(0, 1)
++G.add_edge(1, 0)
++
++# 3-cycle: 2 -> 3 -> 4 -> 2
++G.add_edge(2, 3)
++G.add_edge(3, 4)
++G.add_edge(4, 2)
++
++cycles, total = find_organ_exchange(G)
++
++print(total)
++print(cycles)
++```
++
++Expected result:
++
++```text
++5
++[[0, 1], [2, 3, 4]]
++```
++
++The exact order of cycles in the output is not important.
++
++## Running the demo
++
++```bash
++python organ_exchange_optimizer.py
++```
++
++This runs a small example and a simple random-graph benchmark.
++
++## Running tests
++
++```bash
++python -m unittest discover -s tests -p "test*.py" -v
++```
++
++## Project structure
++
++```text
++organ-exchange-optimizer/
++├── organ_exchange_optimizer.py       # Main solver and demo
++├── requirements.txt                  # Minimal Python dependencies
++├── tests/
++│   ├── __init__.py
++│   └── test_optimizer.py             # Unit tests
++├── examples/
++│   └── q5_kidney_exchange.py         # Original assignment-style entry point
++├── LICENSE
++└── README.md
++```
++
++## Limitations
++
++This is a simplified academic model. In particular, it does not include:
++
++- blood-type or tissue-compatibility calculations;
++- waiting time, urgency, or priority rules;
++- hospital-specific constraints;
++- long exchange chains;
++- uncertainty, failure risk, or scheduling constraints;
++- fairness constraints beyond maximizing the number of matched pairs.
++
++## License
++
++MIT License. See `LICENSE` for details.
+Only in /mnt/data/organ_repo_clean: examples
+diff -ru /mnt/data/organ_repo_original_nocache/organ_exchange_optimizer.py /mnt/data/organ_repo_clean/organ_exchange_optimizer.py
+--- /mnt/data/organ_repo_original_nocache/organ_exchange_optimizer.py	2026-06-07 13:00:49.438850207 +0000
++++ /mnt/data/organ_repo_clean/organ_exchange_optimizer.py	2026-06-07 13:03:17.090739486 +0000
+@@ -1,148 +1,149 @@
+-
+-import networkx as nx
+-import pulp
+-import random
+-import time
+-
+-def find_organ_exchange(g):
+-    """
+-    Finds the maximum set of disjoint cycles for organ exchange optimization.
+-    
+-    Gets a directed graph where nodes = patient-donor pairs
+-    edge a->b means donor of a can give to patient of b
+-    returns max set of disjoint cycles (len 2 or 3) to maximize transplants
+-    
+-    Args:
+-        g (networkx.DiGraph): Directed compatibility graph
+-        
+-    Returns:
+-        tuple: (cycles, total_transplants)
+-            cycles (list): List of selected exchange cycles
+-            total_transplants (int): Total number of patients helped
+-    """
+-    
+-    # first find all cycles of length 2 and 3
+-    cycles = []
+-    seen = set()
+-    
+-    # cycles of length 2 - mutual exchange
+-    for u, v in g.edges():
+-        if g.has_edge(v, u):
+-            c = tuple(sorted([u, v]))
+-            if c not in seen:
+-                seen.add(c)
+-                cycles.append([u, v])
+-
+-    # cycles of length 3
+-    for u in g.nodes():
+-        for v in g.successors(u):
+-            if v == u:
+-                continue
+-            for w in g.successors(v):
+-                if w == u or w == v:
+-                    continue
+-                if g.has_edge(w, u):  # closes the cycle
+-                    c = tuple(sorted([u, v, w]))
+-                    if c not in seen:
+-                        seen.add(c)
+-                        cycles.append([u, v, w])
+-
+-    # now build ILP
+-    # maximize sum of cycle lengths (= number of patients helped)
+-    # constraint: each node in at most one cycle
+-    
+-    prob = pulp.LpProblem("organ_exchange", pulp.LpMaximize)
+-    
+-    # x_i = 1 if we pick cycle i
+-    x = {}
+-    for i in range(len(cycles)):
+-        x[i] = pulp.LpVariable(f"x{i}", cat='Binary')
+-
+-    # objective - maximize total patients
+-    prob += pulp.lpSum(len(cycles[i]) * x[i] for i in range(len(cycles)))
+-
+-    # each node appears in at most one selected cycle
+-    for node in g.nodes():
+-        relevant = [i for i in range(len(cycles)) if node in cycles[i]]
+-        if len(relevant) > 0:
+-            prob += pulp.lpSum(x[i] for i in relevant) <= 1
+-
+-    prob.solve(pulp.PULP_CBC_CMD(msg=0))
+-
+-    # get results
+-    result = []
+-    total = 0
+-    for i in range(len(cycles)):
+-        if pulp.value(x[i]) == 1:
+-            result.append(cycles[i])
+-            total += len(cycles[i])
+-            
+-    return result, total
+-
+-
+-def generate_random_graph(n, p):
+-    """
+-    Generate random directed graph with n nodes, edge probability p.
+-    
+-    Args:
+-        n (int): Number of nodes
+-        p (float): Probability of edge creation (0 to 1)
+-        
+-    Returns:
+-        networkx.DiGraph: Random directed graph
+-    """
+-    g = nx.DiGraph()
+-    g.add_nodes_from(range(n))
+-    for i in range(n):
+-        for j in range(n):
+-            if i != j and random.random() < p:
+-                g.add_edge(i, j)
+-    return g
+-
+-
+-if __name__ == "__main__":
+-    # part a - basic test
+-    print("=== Part A: Basic Test ===")
+-    G = nx.DiGraph()
+-    
+-    # cycle of 2: 0 <-> 1
+-    G.add_edge(0, 1)
+-    G.add_edge(1, 0)
+-    
+-    # cycle of 3: 2 -> 3 -> 4 -> 2
+-    G.add_edge(2, 3)
+-    G.add_edge(3, 4)
+-    G.add_edge(4, 2)
+-    
+-    # extra edge that doesnt form a new cycle
+-    G.add_edge(1, 2)
+-
+-    cycles, num = find_organ_exchange(G)
+-    print(f"transplants: {num}")
+-    print("cycles found:")
+-    for c in cycles:
+-        print("  ", c)
+-    
+-    # part b - test on random graphs with increasing size
+-    print("\n=== Part B: Random Graphs (max 60 sec) ===")
+-    
+-    edge_prob = 0.3
+-    max_n = 0
+-    
+-    # start from small and increase
+-    for n in [10, 20, 30, 50, 75, 100, 150, 200, 250, 300, 400, 500]:
+-        g = generate_random_graph(n, edge_prob)
+-        
+-        start = time.time()
+-        cycles, num = find_organ_exchange(g)
+-        elapsed = time.time() - start
+-        
+-        print(f"n={n}: {num} transplants, time={elapsed:.2f}s")
+-        
+-        if elapsed <= 60:
+-            max_n = n
+-        else:
+-            print(f"exceeded 60 seconds at n={n}")
+-            break
+-    
+-    print(f"\nlargest n that finishes in under 1 minute: {max_n}")
++"""Simplified organ exchange optimizer.
++
++This module solves a coursework version of kidney exchange: given a directed
++compatibility graph, select a maximum-size set of disjoint 2-cycles and
++3-cycles.
++"""
++
++import random
++import time
++
++import networkx as nx
++import pulp
++
++
++def find_organ_exchange(g):
++    """Return a maximum-size set of disjoint exchange cycles.
++
++    Args:
++        g (networkx.DiGraph): Directed compatibility graph. Nodes are
++            patient-donor pairs. An edge ``u -> v`` means the donor from pair
++            ``u`` can donate to the patient from pair ``v``.
++
++    Returns:
++        tuple[list[list], int]: A pair ``(cycles, total_transplants)`` where
++        ``cycles`` contains selected cycles of length 2 or 3, and
++        ``total_transplants`` is the number of participating pairs.
++    """
++    cycles = []
++    seen = set()
++
++    # 2-cycles: u -> v and v -> u.
++    for u, v in g.edges():
++        if u == v:
++            continue
++        if g.has_edge(v, u):
++            cycle_key = tuple(sorted([u, v]))
++            if cycle_key not in seen:
++                seen.add(cycle_key)
++                cycles.append([u, v])
++
++    # 3-cycles: u -> v -> w -> u.
++    for u in g.nodes():
++        for v in g.successors(u):
++            if v == u:
++                continue
++            for w in g.successors(v):
++                if w == u or w == v:
++                    continue
++                if g.has_edge(w, u):
++                    cycle_key = tuple(sorted([u, v, w]))
++                    if cycle_key not in seen:
++                        seen.add(cycle_key)
++                        cycles.append([u, v, w])
++
++    prob = pulp.LpProblem("organ_exchange", pulp.LpMaximize)
++
++    # x[i] = 1 if cycle i is selected.
++    x = {
++        i: pulp.LpVariable(f"x{i}", cat="Binary")
++        for i in range(len(cycles))
++    }
++
++    # Maximize the number of matched patient-donor pairs.
++    prob += pulp.lpSum(len(cycles[i]) * x[i] for i in range(len(cycles)))
++
++    # Each pair may participate in at most one selected cycle.
++    for node in g.nodes():
++        relevant_cycles = [i for i, cycle in enumerate(cycles) if node in cycle]
++        if relevant_cycles:
++            prob += pulp.lpSum(x[i] for i in relevant_cycles) <= 1
++
++    status = prob.solve(pulp.PULP_CBC_CMD(msg=0))
++    if pulp.LpStatus[status] != "Optimal":
++        raise RuntimeError(f"ILP solver did not find an optimal solution: {pulp.LpStatus[status]}")
++
++    selected_cycles = []
++    total_transplants = 0
++    for i, cycle in enumerate(cycles):
++        if pulp.value(x[i]) and pulp.value(x[i]) > 0.5:
++            selected_cycles.append(cycle)
++            total_transplants += len(cycle)
++
++    return selected_cycles, total_transplants
++
++
++def generate_random_graph(n, p, seed=None):
++    """Generate a random directed graph for examples and tests."""
++    rng = random.Random(seed) if seed is not None else random
++    g = nx.DiGraph()
++    g.add_nodes_from(range(n))
++
++    for i in range(n):
++        for j in range(n):
++            if i != j and rng.random() < p:
++                g.add_edge(i, j)
++
++    return g
++
++
++def _run_basic_example():
++    print("=== Basic example ===")
++    g = nx.DiGraph()
++
++    # 2-cycle: 0 <-> 1.
++    g.add_edge(0, 1)
++    g.add_edge(1, 0)
++
++    # 3-cycle: 2 -> 3 -> 4 -> 2.
++    g.add_edge(2, 3)
++    g.add_edge(3, 4)
++    g.add_edge(4, 2)
++
++    # Extra edge that does not create a better solution.
++    g.add_edge(1, 2)
++
++    cycles, total = find_organ_exchange(g)
++    print(f"transplants: {total}")
++    print("cycles found:")
++    for cycle in cycles:
++        print("  ", cycle)
++
++
++def _run_random_benchmark():
++    print("\n=== Random graph benchmark ===")
++
++    edge_prob = 0.3
++    max_n_under_one_minute = 0
++
++    for n in [10, 20, 30, 50, 75, 100, 150, 200, 250, 300, 400, 500]:
++        g = generate_random_graph(n, edge_prob, seed=n)
++
++        start = time.time()
++        cycles, total = find_organ_exchange(g)
++        elapsed = time.time() - start
++
++        print(f"n={n}: {total} transplants, {len(cycles)} cycles, time={elapsed:.2f}s")
++
++        if elapsed <= 60:
++            max_n_under_one_minute = n
++        else:
++            print(f"exceeded 60 seconds at n={n}")
++            break
++
++    print(f"\nlargest n that finished in under 1 minute: {max_n_under_one_minute}")
++
++
++if __name__ == "__main__":
++    _run_basic_example()
++    _run_random_benchmark()
+Only in /mnt/data/organ_repo_original_nocache: q5_kidney_exchange.py
+diff -ru /mnt/data/organ_repo_original_nocache/requirements.txt /mnt/data/organ_repo_clean/requirements.txt
+--- /mnt/data/organ_repo_original_nocache/requirements.txt	2026-06-07 13:00:49.440815565 +0000
++++ /mnt/data/organ_repo_clean/requirements.txt	2026-06-07 13:02:44.173578795 +0000
+@@ -1,12 +1,2 @@
+-# Organ Exchange Optimizer - Dependencies
+-# Python 3.7+
+-
+-# Graph algorithms and data structures
+-networkx>=2.6
+-
+-# Linear programming solver interface
+-pulp>=2.5
+-
+-# Optional: For faster performance with larger graphs
+-scipy>=1.7.0
+-numpy>=1.21.0
++networkx>=2.6
++pulp>=2.5
+Only in /mnt/data/organ_repo_clean/tests: __init__.py
+diff -ru /mnt/data/organ_repo_original_nocache/tests/test_optimizer.py /mnt/data/organ_repo_clean/tests/test_optimizer.py
+--- /mnt/data/organ_repo_original_nocache/tests/test_optimizer.py	2026-06-07 13:00:49.436732588 +0000
++++ /mnt/data/organ_repo_clean/tests/test_optimizer.py	2026-06-07 13:02:44.174493219 +0000
+@@ -1,111 +1,104 @@
+-"""Unit tests for organ exchange optimizer"""
+-
+-import unittest
+-import networkx as nx
+-from organ_exchange_optimizer import find_organ_exchange, generate_random_graph
+-
+-
+-class TestOrganExchangeOptimizer(unittest.TestCase):
+-    """Test cases for the organ exchange optimizer"""
+-    
+-    def test_simple_2cycle(self):
+-        """Test basic 2-cycle (mutual exchange)"""
+-        G = nx.DiGraph()
+-        G.add_edge(0, 1)
+-        G.add_edge(1, 0)
+-        
+-        cycles, total = find_organ_exchange(G)
+-        
+-        self.assertEqual(total, 2)
+-        self.assertEqual(len(cycles), 1)
+-        self.assertIn([0, 1], cycles)
+-    
+-    def test_simple_3cycle(self):
+-        """Test basic 3-cycle"""
+-        G = nx.DiGraph()
+-        G.add_edge(0, 1)
+-        G.add_edge(1, 2)
+-        G.add_edge(2, 0)
+-        
+-        cycles, total = find_organ_exchange(G)
+-        
+-        self.assertEqual(total, 3)
+-        self.assertEqual(len(cycles), 1)
+-    
+-    def test_multiple_disjoint_cycles(self):
+-        """Test multiple disjoint cycles"""
+-        G = nx.DiGraph()
+-        # First 2-cycle: 0 <-> 1
+-        G.add_edge(0, 1)
+-        G.add_edge(1, 0)
+-        # Second 2-cycle: 2 <-> 3
+-        G.add_edge(2, 3)
+-        G.add_edge(3, 2)
+-        
+-        cycles, total = find_organ_exchange(G)
+-        
+-        self.assertEqual(total, 4)
+-        self.assertEqual(len(cycles), 2)
+-    
+-    def test_no_cycles(self):
+-        """Test graph with no cycles"""
+-        G = nx.DiGraph()
+-        G.add_edge(0, 1)
+-        G.add_edge(1, 2)
+-        # No cycles possible
+-        
+-        cycles, total = find_organ_exchange(G)
+-        
+-        self.assertEqual(total, 0)
+-        self.assertEqual(len(cycles), 0)
+-    
+-    def test_complex_case(self):
+-        """Test complex case with multiple cycles"""
+-        G = nx.DiGraph()
+-        # 2-cycle: 0 <-> 1
+-        G.add_edge(0, 1)
+-        G.add_edge(1, 0)
+-        # 3-cycle: 2 -> 3 -> 4 -> 2
+-        G.add_edge(2, 3)
+-        G.add_edge(3, 4)
+-        G.add_edge(4, 2)
+-        # Extra edge
+-        G.add_edge(1, 2)
+-        
+-        cycles, total = find_organ_exchange(G)
+-        
+-        self.assertEqual(total, 5)
+-        self.assertEqual(len(cycles), 2)
+-    
+-    def test_generate_random_graph(self):
+-        """Test random graph generation"""
+-        G = generate_random_graph(n=10, p=0.5)
+-        
+-        self.assertEqual(G.number_of_nodes(), 10)
+-        self.assertIsInstance(G, nx.DiGraph)
+-        # With p=0.5 and 10 nodes, expect roughly 45 edges (n*(n-1)*p)
+-        self.assertGreater(G.number_of_edges(), 20)
+-        self.assertLess(G.number_of_edges(), 80)
+-    
+-    def test_single_node(self):
+-        """Test with single node (no self-loops expected)"""
+-        G = nx.DiGraph()
+-        G.add_node(0)
+-        
+-        cycles, total = find_organ_exchange(G)
+-        
+-        self.assertEqual(total, 0)
+-        self.assertEqual(len(cycles), 0)
+-    
+-    def test_empty_graph(self):
+-        """Test with empty graph"""
+-        G = nx.DiGraph()
+-        
+-        cycles, total = find_organ_exchange(G)
+-        
+-        self.assertEqual(total, 0)
+-        self.assertEqual(len(cycles), 0)
+-
+-
+-if __name__ == '__main__':
+-    unittest.main()
++"""Unit tests for the organ exchange optimizer."""
++
++import unittest
++
++import networkx as nx
++
++from organ_exchange_optimizer import find_organ_exchange, generate_random_graph
++
++
++class TestOrganExchangeOptimizer(unittest.TestCase):
++    def test_simple_2_cycle(self):
++        g = nx.DiGraph()
++        g.add_edge(0, 1)
++        g.add_edge(1, 0)
++
++        cycles, total = find_organ_exchange(g)
++
++        self.assertEqual(total, 2)
++        self.assertEqual(len(cycles), 1)
++        self.assertIn([0, 1], cycles)
++
++    def test_simple_3_cycle(self):
++        g = nx.DiGraph()
++        g.add_edge(0, 1)
++        g.add_edge(1, 2)
++        g.add_edge(2, 0)
++
++        cycles, total = find_organ_exchange(g)
++
++        self.assertEqual(total, 3)
++        self.assertEqual(len(cycles), 1)
++
++    def test_multiple_disjoint_cycles(self):
++        g = nx.DiGraph()
++        g.add_edge(0, 1)
++        g.add_edge(1, 0)
++        g.add_edge(2, 3)
++        g.add_edge(3, 2)
++
++        cycles, total = find_organ_exchange(g)
++
++        self.assertEqual(total, 4)
++        self.assertEqual(len(cycles), 2)
++
++    def test_no_cycles(self):
++        g = nx.DiGraph()
++        g.add_edge(0, 1)
++        g.add_edge(1, 2)
++
++        cycles, total = find_organ_exchange(g)
++
++        self.assertEqual(total, 0)
++        self.assertEqual(cycles, [])
++
++    def test_complex_case(self):
++        g = nx.DiGraph()
++        g.add_edge(0, 1)
++        g.add_edge(1, 0)
++        g.add_edge(2, 3)
++        g.add_edge(3, 4)
++        g.add_edge(4, 2)
++        g.add_edge(1, 2)
++
++        cycles, total = find_organ_exchange(g)
++
++        self.assertEqual(total, 5)
++        self.assertEqual(len(cycles), 2)
++
++    def test_self_loop_is_not_counted_as_exchange(self):
++        g = nx.DiGraph()
++        g.add_edge(0, 0)
++
++        cycles, total = find_organ_exchange(g)
++
++        self.assertEqual(total, 0)
++        self.assertEqual(cycles, [])
++
++    def test_generate_random_graph(self):
++        g = generate_random_graph(n=10, p=0.5, seed=1)
++
++        self.assertEqual(g.number_of_nodes(), 10)
++        self.assertIsInstance(g, nx.DiGraph)
++        self.assertFalse(any(u == v for u, v in g.edges()))
++
++    def test_single_node(self):
++        g = nx.DiGraph()
++        g.add_node(0)
++
++        cycles, total = find_organ_exchange(g)
++
++        self.assertEqual(total, 0)
++        self.assertEqual(cycles, [])
++
++    def test_empty_graph(self):
++        g = nx.DiGraph()
++
++        cycles, total = find_organ_exchange(g)
++
++        self.assertEqual(total, 0)
++        self.assertEqual(cycles, [])
++
++
++if __name__ == "__main__":
++    unittest.main()
