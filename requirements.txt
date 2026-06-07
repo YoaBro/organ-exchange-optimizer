@@ -1,0 +1,12 @@
+# Organ Exchange Optimizer - Dependencies
+# Python 3.7+
+
+# Graph algorithms and data structures
+networkx>=2.6
+
+# Linear programming solver interface
+pulp>=2.5
+
+# Optional: For faster performance with larger graphs
+scipy>=1.7.0
+numpy>=1.21.0
