@@ -213,12 +213,6 @@ organ-exchange-optimizer/
     └── test_optimizer.py          # Unit tests
 ```
 
-## License
-
-MIT License - See LICENSE file for details.
-
-Free for educational and commercial use with attribution.
-
 ## Disclaimer
 
 **Note**: This is a solution to an academic assignment. For real medical applications, additional constraints must be included:
